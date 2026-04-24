@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>유튜브 채널 AI 분석기</title>
+<title>유튜브 AI 분석기</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -11,122 +11,168 @@
 body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh}
 .top-bar{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--bg);z-index:100}
 .logo-dot{width:10px;height:10px;background:var(--accent);border-radius:50%}
-.logo-text{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);letter-spacing:.05em}
+.logo-text{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2)}
 .main{max-width:820px;margin:0 auto;padding:48px 24px 80px}
-.hero{margin-bottom:48px}
-.hero h1{font-size:36px;font-weight:700;line-height:1.2;margin-bottom:12px}
+.hero{margin-bottom:40px}
+.hero h1{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:10px}
 .hero h1 span{color:var(--accent)}
-.hero p{font-size:15px;color:var(--text2);font-weight:300}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px}
-.card-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;margin-bottom:12px;text-transform:uppercase}
-.card h2{font-size:16px;font-weight:500;margin-bottom:16px;color:var(--text)}
-input[type=text],input[type=password],input[type=number],select{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;font-size:14px;color:var(--text);font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s}
-input:focus,select:focus{border-color:var(--accent)}
-input::placeholder{color:var(--text3)}
-.row{display:flex;gap:10px;align-items:center}
+.hero p{font-size:14px;color:var(--text2)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.card-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:.1em;margin-bottom:10px;text-transform:uppercase}
+.card h2{font-size:15px;font-weight:500;margin-bottom:14px}
+.input-wrap{position:relative;margin-bottom:10px}
+input[type=text],input[type=password],input[type=number],select,textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color .2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+textarea{resize:vertical;min-height:100px;line-height:1.6}
+.row{display:flex;gap:8px;align-items:center}
 .row input{flex:1}
-.btn{padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;transition:all .15s}
+.btn{padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif;white-space:nowrap;transition:all .15s}
 .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
 .btn-ghost:hover{border-color:var(--text2);color:var(--text)}
-.btn-accent{background:var(--accent);color:#000;font-weight:700;font-size:14px;padding:14px 28px}
+.btn-accent{background:var(--accent);color:#000;font-weight:700;font-size:14px;padding:13px 26px}
 .btn-accent:hover{background:var(--accent2)}
 .btn-accent:disabled{opacity:.4;cursor:not-allowed}
-.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
-.hint{font-size:12px;color:var(--text3);margin-top:10px;line-height:1.6}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:8px}
+.hint{font-size:12px;color:var(--text3);margin-top:7px;line-height:1.6}
 .hint a{color:var(--accent);text-decoration:none}
-.select-label{font-size:12px;color:var(--text2);margin-bottom:6px}
-.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:12px;padding:5px 12px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.select-label{font-size:12px;color:var(--text2);margin-bottom:5px}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.chip{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);color:var(--text2);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all .15s}
 .chip:hover{border-color:var(--accent);color:var(--accent)}
-.divider{height:1px;background:var(--border);margin:16px 0}
-.progress-wrap{margin-top:16px;display:none}
-.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.progress-wrap{margin-top:14px;display:none}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
 .progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0%}
 .progress-text{font-size:12px;color:var(--text3);font-family:'DM Mono',monospace}
-.results{margin-top:32px}
-.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-.results-header h2{font-size:18px;font-weight:500}
-.results-count{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)}
-.video-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:12px}
-.video-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:8px}
-.video-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;line-height:1.4}
-.video-meta{font-size:12px;color:var(--text3);margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.video-link{color:var(--accent);text-decoration:none;font-size:12px;cursor:pointer}
+.results{margin-top:28px}
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.results-header h2{font-size:17px;font-weight:500}
+.video-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:10px}
+.video-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);margin-bottom:6px}
+.video-title{font-size:14px;font-weight:500;color:var(--text);margin-bottom:5px;line-height:1.4}
+.video-meta{font-size:12px;color:var(--text3);margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.video-link{color:var(--accent);text-decoration:none;font-size:12px}
 .video-link:hover{text-decoration:underline}
-.summary-box{background:var(--surface2);border-radius:10px;padding:16px;font-size:13px;color:var(--text2);line-height:1.6}
+.summary-box{background:var(--surface2);border-radius:10px;padding:16px;font-size:13px;color:var(--text2);line-height:1.7}
+.summary-box .sec-title{font-size:13px;font-weight:700;color:var(--accent);margin:14px 0 6px;display:block}
+.summary-box .sec-title:first-child{margin-top:0}
 .summary-box strong{color:var(--text);font-weight:600}
+.summary-box ul{padding-left:4px;list-style:none}
+.summary-box ul li{padding:3px 0;padding-left:14px;position:relative}
+.summary-box ul li::before{content:'•';position:absolute;left:0;color:var(--accent)}
 .summary-loading{color:var(--text3);font-style:italic;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.error-box{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:10px;padding:16px;font-size:13px;color:var(--red);line-height:1.6}
-.sort-tabs{display:flex;gap:8px;margin-bottom:16px}
-.sort-tab{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .15s}
+.error-box{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:10px;padding:14px;font-size:13px;color:var(--red);line-height:1.6}
+.sort-tabs{display:flex;gap:7px;margin-bottom:14px}
+.sort-tab{padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .15s}
 .sort-tab.active{background:var(--accent);color:#000;border-color:var(--accent)}
-.range-row{display:flex;align-items:center;gap:10px}
-.range-row input[type=number]{width:90px;text-align:center}
-.range-hint{font-size:12px;color:var(--text3);margin-top:8px}
-.duration-badge{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--surface2);color:var(--text3);border:1px solid var(--border2)}
-.copy-bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-.ext-notice{background:rgba(232,255,71,.08);border:1px solid rgba(232,255,71,.3);border-radius:10px;padding:14px;font-size:13px;color:var(--accent);margin-bottom:16px;line-height:1.7}
-@media(max-width:600px){.hero h1{font-size:26px}.main{padding:32px 16px 60px}}
+.mode-tabs{display:flex;gap:7px;margin-bottom:18px}
+.mode-tab{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:'Noto Sans KR',sans-serif;transition:all .15s;text-align:center}
+.mode-tab.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.range-row{display:flex;align-items:center;gap:8px}
+.range-row input[type=number]{width:85px;text-align:center}
+.duration-badge{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--surface2);color:var(--text3);border:1px solid var(--border2)}
+.copy-bar{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.ext-notice{background:rgba(232,255,71,.07);border:1px solid rgba(232,255,71,.25);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--accent);margin-bottom:14px;line-height:1.7}
+.saved-badge{font-size:11px;color:var(--green);margin-left:8px}
+/* 자동완성 드롭다운 */
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border2);border-radius:10px;z-index:50;overflow:hidden;display:none}
+.autocomplete-list.show{display:block}
+.autocomplete-item{padding:10px 14px;font-size:13px;cursor:pointer;color:var(--text2);transition:background .15s}
+.autocomplete-item:hover{background:var(--surface2);color:var(--text)}
+/* URL 입력 리스트 */
+.url-list{margin-top:10px}
+.url-item{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.url-item input{flex:1}
+.url-remove{padding:8px 10px;border-radius:8px;background:transparent;border:1px solid var(--border2);color:var(--red);cursor:pointer;font-size:13px;line-height:1}
+.url-remove:hover{background:rgba(255,71,87,.1)}
+@media(max-width:600px){.hero h1{font-size:24px}.main{padding:28px 14px 60px}}
 </style>
 </head>
 <body>
 <div class="top-bar">
   <div class="logo-dot"></div>
-  <span class="logo-text">youtube-analyzer v3.0</span>
+  <span class="logo-text">youtube-analyzer v4.0</span>
 </div>
 <div class="main">
   <div class="hero">
-    <h1>유튜브 채널<br><span>AI 심층 분석기</span></h1>
-    <p>영상 클릭 → 크롬 확장이 자막 자동 추출 → Claude가 요약</p>
+    <h1>유튜브<br><span>AI 심층 분석기</span></h1>
+    <p>채널 전체 or 원하는 영상만 선택 → Claude가 밀도 있게 요약</p>
   </div>
 
+  <!-- API 키 -->
   <div class="card">
-    <div class="card-label">Step 01</div>
-    <h2>API 키 입력</h2>
-    <div style="margin-bottom:14px">
-      <div class="select-label">Claude API 키</div>
+    <div class="card-label">API 키</div>
+    <div style="margin-bottom:12px">
+      <div class="select-label">Claude API 키 <span id="claudeSaved" class="saved-badge"></span></div>
       <div class="row">
         <input type="password" id="claudeKey" placeholder="sk-ant-api03-..."/>
         <button class="btn btn-ghost" onclick="toggleShow('claudeKey',this)">보기</button>
+        <button class="btn btn-ghost" onclick="saveKeys()">저장</button>
       </div>
-      <p class="hint">→ <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> 에서 발급</p>
     </div>
     <div>
-      <div class="select-label">YouTube Data API 키</div>
+      <div class="select-label">YouTube Data API 키 <span id="ytSaved" class="saved-badge"></span></div>
       <div class="row">
         <input type="password" id="ytKey" placeholder="AIza..."/>
         <button class="btn btn-ghost" onclick="toggleShow('ytKey',this)">보기</button>
       </div>
-      <p class="hint">→ <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> → YouTube Data API v3 → API 키 생성 (무료)</p>
+      <p class="hint">키는 브라우저에 저장되며 다음 방문 시 자동으로 불러옵니다</p>
     </div>
   </div>
 
+  <!-- 분석 모드 -->
   <div class="card">
-    <div class="card-label">Step 02</div>
-    <h2>채널 설정</h2>
-    <div class="select-label">채널 URL 또는 @핸들</div>
-    <input type="text" id="channelInput" placeholder="예: @백만장자앤더슨" style="width:100%"/>
-    <div class="chip-row">
-      <span style="font-size:12px;color:var(--text3);align-self:center">예시</span>
-      <button class="chip" onclick="setChannel('@신사임당')">@신사임당</button>
-      <button class="chip" onclick="setChannel('@머니그라운드')">@머니그라운드</button>
-      <button class="chip" onclick="setChannel('@부읽남')">@부읽남</button>
-      <button class="chip" onclick="setChannel('@백만장자앤더슨')">@백만장자앤더슨</button>
+    <div class="card-label">분석 모드</div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="mode-channel" onclick="setMode('channel')">📺 채널 전체 분석</button>
+      <button class="mode-tab" id="mode-video" onclick="setMode('video')">🎯 개별 영상 선택</button>
     </div>
-    <div class="divider"></div>
-    <div class="select-label">정렬 방식</div>
-    <div class="sort-tabs">
-      <button class="sort-tab active" id="tab-recent" onclick="setSort('recent')">최신순</button>
-      <button class="sort-tab" id="tab-popular" onclick="setSort('popular')">인기순</button>
+
+    <!-- 채널 모드 -->
+    <div id="channelMode">
+      <div class="select-label">채널 URL 또는 @핸들</div>
+      <div class="autocomplete-wrap">
+        <input type="text" id="channelInput" placeholder="예: @백만장자앤더슨" autocomplete="off"
+          oninput="onChannelInput()" onfocus="showHistory()" onblur="hideHistory()"/>
+        <div class="autocomplete-list" id="autocompleteList"></div>
+      </div>
+      <div class="chip-row">
+        <span style="font-size:12px;color:var(--text3);align-self:center">예시</span>
+        <button class="chip" onclick="setChannel('@신사임당')">@신사임당</button>
+        <button class="chip" onclick="setChannel('@머니그라운드')">@머니그라운드</button>
+        <button class="chip" onclick="setChannel('@부읽남')">@부읽남</button>
+        <button class="chip" onclick="setChannel('@백만장자앤더슨')">@백만장자앤더슨</button>
+      </div>
+      <div class="divider"></div>
+      <div class="select-label">정렬 방식</div>
+      <div class="sort-tabs">
+        <button class="sort-tab active" id="tab-recent" onclick="setSort('recent')">최신순</button>
+        <button class="sort-tab" id="tab-popular" onclick="setSort('popular')">인기순</button>
+      </div>
+      <div class="select-label">영상 범위 <span style="color:var(--text3);font-size:11px">(끝 번호 비우면 전체)</span></div>
+      <div class="range-row">
+        <input type="number" id="rangeStart" value="1" min="1" style="width:85px"/>
+        <span style="color:var(--text3)">~</span>
+        <input type="number" id="rangeEnd" placeholder="전체" min="1" style="width:85px"/>
+      </div>
+      <p style="font-size:12px;color:var(--text3);margin-top:7px">예: 1~20 → 처음 20개 / 13~49 → 13번째부터 / 비워두면 전체</p>
     </div>
-    <div class="select-label">영상 범위 <span style="color:var(--text3);font-size:11px">(끝 번호 비우면 전체)</span></div>
-    <div class="range-row">
-      <input type="number" id="rangeStart" value="1" min="1"/>
-      <span style="color:var(--text3)">~</span>
-      <input type="number" id="rangeEnd" placeholder="전체" min="1"/>
+
+    <!-- 개별 영상 모드 -->
+    <div id="videoMode" style="display:none">
+      <div class="select-label">영상 URL 입력 <span style="color:var(--text3);font-size:11px">(여러 개 추가 가능)</span></div>
+      <div class="url-list" id="urlList">
+        <div class="url-item">
+          <input type="text" placeholder="https://www.youtube.com/watch?v=..."/>
+          <button class="url-remove" onclick="removeUrl(this)">✕</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:4px" onclick="addUrlInput()">+ URL 추가</button>
     </div>
-    <p class="range-hint">예: 1~20 → 처음 20개 / 13~49 → 13번째부터 / 비워두면 전체</p>
+
     <div class="divider"></div>
     <div class="select-label">요약 스타일</div>
     <select id="summaryStyle" style="width:100%">
@@ -137,13 +183,10 @@ input::placeholder{color:var(--text3)}
     </select>
   </div>
 
+  <!-- 실행 -->
   <div class="card">
-    <div class="card-label">Step 03</div>
-    <h2>분석 시작</h2>
-    <div class="ext-notice">
-      💡 <strong>크롬 확장 프로그램</strong>을 설치하셨으면 영상 클릭 시 자막이 자동으로 수집돼요!<br>
-      미설치 시에는 제목+설명 기반으로 요약됩니다.
-    </div>
+    <div class="card-label">분석 시작</div>
+    <div class="ext-notice">💡 <strong>크롬 확장 프로그램</strong> 설치 시 영상 클릭하면 자막 자동 수집 → 밀도 높은 요약 가능</div>
     <button class="btn btn-accent" id="startBtn" onclick="startAnalysis()">분석 시작하기 →</button>
     <div class="progress-wrap" id="progressWrap">
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -155,20 +198,66 @@ input::placeholder{color:var(--text3)}
 </div>
 
 <script>
-let currentSort = 'recent';
-let allSummaries = [];
-let gClaudeKey = '';
-let gStyle = 'coupang';
-let gChannelName = '';
-const transcriptCallbacks = {};
+var currentSort = 'recent';
+var currentMode = 'channel';
+var allSummaries = [];
+var gClaudeKey = '';
+var gStyle = 'coupang';
+var gChannelName = '';
+var transcriptCallbacks = {};
+var channelHistory = [];
 
-// 크롬 확장 메시지 수신
-window.addEventListener('TRANSCRIPT_FROM_EXTENSION', function(event) {
-  var data = event.detail;
-  if (data && transcriptCallbacks[data.videoId]) {
-    transcriptCallbacks[data.videoId](data);
-  }
+// 초기화 - 저장된 키 불러오기
+window.addEventListener('load', function() {
+  var ck = localStorage.getItem('claudeKey');
+  var yk = localStorage.getItem('ytKey');
+  if (ck) { document.getElementById('claudeKey').value = ck; document.getElementById('claudeSaved').textContent = '✓ 저장됨'; }
+  if (yk) { document.getElementById('ytKey').value = yk; document.getElementById('ytSaved').textContent = '✓ 저장됨'; }
+  var hist = localStorage.getItem('channelHistory');
+  if (hist) channelHistory = JSON.parse(hist);
 });
+
+function saveKeys() {
+  var ck = document.getElementById('claudeKey').value.trim();
+  var yk = document.getElementById('ytKey').value.trim();
+  if (ck) { localStorage.setItem('claudeKey', ck); document.getElementById('claudeSaved').textContent = '✓ 저장됨'; }
+  if (yk) localStorage.setItem('ytKey', yk);
+  alert('저장됐어요! 다음에 자동으로 불러옵니다 😊');
+}
+
+function saveChannelHistory(val) {
+  if (!val) return;
+  channelHistory = [val].concat(channelHistory.filter(function(h){ return h !== val; })).slice(0, 10);
+  localStorage.setItem('channelHistory', JSON.stringify(channelHistory));
+}
+
+function onChannelInput() {
+  var val = document.getElementById('channelInput').value;
+  var filtered = channelHistory.filter(function(h){ return h.includes(val); });
+  renderAutocomplete(filtered);
+}
+
+function showHistory() {
+  renderAutocomplete(channelHistory);
+}
+
+function hideHistory() {
+  setTimeout(function(){ document.getElementById('autocompleteList').classList.remove('show'); }, 200);
+}
+
+function renderAutocomplete(items) {
+  var list = document.getElementById('autocompleteList');
+  if (!items.length) { list.classList.remove('show'); return; }
+  list.innerHTML = items.map(function(h){
+    return '<div class="autocomplete-item" onmousedown="selectHistory(\'' + h + '\')">' + h + '</div>';
+  }).join('');
+  list.classList.add('show');
+}
+
+function selectHistory(val) {
+  document.getElementById('channelInput').value = val;
+  document.getElementById('autocompleteList').classList.remove('show');
+}
 
 function toggleShow(id, btn) {
   var el = document.getElementById(id);
@@ -176,12 +265,42 @@ function toggleShow(id, btn) {
   btn.textContent = el.type === 'password' ? '보기' : '숨기기';
 }
 
-function setChannel(name) { document.getElementById('channelInput').value = name; }
+function setChannel(name) {
+  document.getElementById('channelInput').value = name;
+  document.getElementById('autocompleteList').classList.remove('show');
+}
 
 function setSort(type) {
   currentSort = type;
   document.getElementById('tab-recent').classList.toggle('active', type === 'recent');
   document.getElementById('tab-popular').classList.toggle('active', type === 'popular');
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('mode-channel').classList.toggle('active', mode === 'channel');
+  document.getElementById('mode-video').classList.toggle('active', mode === 'video');
+  document.getElementById('channelMode').style.display = mode === 'channel' ? 'block' : 'none';
+  document.getElementById('videoMode').style.display = mode === 'video' ? 'block' : 'none';
+}
+
+function addUrlInput() {
+  var list = document.getElementById('urlList');
+  var item = document.createElement('div');
+  item.className = 'url-item';
+  item.innerHTML = '<input type="text" placeholder="https://www.youtube.com/watch?v=..."/><button class="url-remove" onclick="removeUrl(this)">✕</button>';
+  list.appendChild(item);
+}
+
+function removeUrl(btn) {
+  var items = document.querySelectorAll('.url-item');
+  if (items.length > 1) btn.parentElement.remove();
+  else btn.parentElement.querySelector('input').value = '';
+}
+
+function getVideoIdFromUrl(url) {
+  var m = url.match(/[?&]v=([^&]+)/);
+  return m ? m[1] : null;
 }
 
 function setProgress(pct, msg) {
@@ -191,7 +310,7 @@ function setProgress(pct, msg) {
 
 async function getChannelId(ytKey, input) {
   input = input.trim();
-  var match = input.match(/@([\w\-]+)/);
+  var match = input.match(/@([\w\-\.]+)/);
   var handle = match ? match[1] : input.replace('@','');
   var r = await fetch('https://www.googleapis.com/youtube/v3/channels?part=id,snippet&forHandle=' + encodeURIComponent(handle) + '&key=' + ytKey);
   var d = await r.json();
@@ -213,8 +332,7 @@ async function getVideos(ytKey, channelId, sortType, startIdx, endIdx) {
     var fetchCount = Math.min(50, needCount - videos.length);
     var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&type=video&order=' + order + '&maxResults=' + fetchCount + '&key=' + ytKey;
     if (pageToken) url += '&pageToken=' + pageToken;
-    var r = await fetch(url);
-    var d = await r.json();
+    var r = await fetch(url); var d = await r.json();
     if (d.error) throw new Error('영상 목록 오류: ' + d.error.message);
     videos = videos.concat(d.items || []);
     if (!d.nextPageToken) break;
@@ -223,46 +341,62 @@ async function getVideos(ytKey, channelId, sortType, startIdx, endIdx) {
   return videos.slice(startIdx - 1, endIdx || videos.length);
 }
 
+async function getVideoInfo(ytKey, videoId) {
+  var r = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=' + videoId + '&key=' + ytKey);
+  var d = await r.json();
+  if (!d.items || !d.items.length) throw new Error('영상을 찾을 수 없어요: ' + videoId);
+  var item = d.items[0];
+  return {
+    title: item.snippet.title,
+    channelName: item.snippet.channelTitle,
+    date: formatDate(item.snippet.publishedAt),
+    duration: parseDuration(item.contentDetails.duration)
+  };
+}
+
 async function getVideoDetails(ytKey, videoIds) {
   var r = await fetch('https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=' + videoIds.join(',') + '&key=' + ytKey);
   var d = await r.json();
   if (d.error) return {};
   var map = {};
-  (d.items || []).forEach(function(v) { map[v.id] = parseDuration(v.contentDetails.duration); });
+  (d.items||[]).forEach(function(v){ map[v.id] = parseDuration(v.contentDetails.duration); });
   return map;
 }
 
 function parseDuration(iso) {
   var m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
   if (!m) return 0;
-  return (parseInt(m[1]||0)*3600) + (parseInt(m[2]||0)*60) + parseInt(m[3]||0);
+  return (parseInt(m[1]||0)*3600)+(parseInt(m[2]||0)*60)+parseInt(m[3]||0);
 }
 
 function formatDuration(sec) {
-  var h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-  if (h > 0) return h + '시간 ' + m + '분';
-  if (m > 0) return m + '분 ' + s + '초';
-  return s + '초';
+  var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
+  if(h>0) return h+'시간 '+m+'분';
+  if(m>0) return m+'분 '+s+'초';
+  return s+'초';
 }
 
 function formatDate(str) {
-  var d = new Date(str);
-  return d.getFullYear() + '.' + String(d.getMonth()+1).padStart(2,'0') + '.' + String(d.getDate()).padStart(2,'0');
+  var d=new Date(str);
+  return d.getFullYear()+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+String(d.getDate()).padStart(2,'0');
 }
+
+// 크롬 확장 메시지 수신
+window.addEventListener('TRANSCRIPT_FROM_EXTENSION', function(event) {
+  var data = event.detail;
+  if (data && transcriptCallbacks[data.videoId]) transcriptCallbacks[data.videoId](data);
+});
 
 async function waitForTranscript(videoId, cardIndex) {
   return new Promise(function(resolve) {
-    var done = false;
-    var elapsed = 0;
+    var done = false, elapsed = 0;
     var statusEl = document.getElementById('sum-' + cardIndex);
-
     transcriptCallbacks[videoId] = function(data) {
       if (done) return;
       done = true;
       delete transcriptCallbacks[videoId];
       resolve(data.transcript ? { text: data.transcript } : null);
     };
-
     var timer = setInterval(function() {
       if (done) { clearInterval(timer); return; }
       elapsed++;
@@ -281,81 +415,123 @@ async function waitForTranscript(videoId, cardIndex) {
 
 async function summarize(title, channelName, date, duration, transcript, style) {
   var styleMap = {
-    coupang: '쿠팡 셀러, 온라인 쇼핑몰, 부업 관점',
-    investment: '투자, 재테크, 자산 관리 관점',
-    parenting: '육아, 자녀 교육, 라이프스타일 관점',
-    general: '일반적인 관점'
+    coupang:'쿠팡 셀러, 온라인 쇼핑몰, 부업 관점',
+    investment:'투자, 재테크, 자산 관리 관점',
+    parenting:'육아, 자녀 교육, 라이프스타일 관점',
+    general:'일반적인 관점'
   };
-
-  var durationMin = Math.round(duration / 60);
+  var durationMin = Math.round(duration/60);
   var hasTranscript = transcript && transcript.text && transcript.text.length > 200;
+  var depthGuide = durationMin<=5 ? '핵심만 간결하게.' :
+    durationMin<=15 ? '주요 논점과 근거를 충분히.' :
+    durationMin<=30 ? '논리 흐름, 핵심 주장, 수치/사례, 방법론을 정리.' :
+    durationMin+'분 장편. 보지 않은 사람도 본 것처럼 대화할 수 있을 만큼. 주장, 논거, 사례, 수치, 방법론, 주의사항, 결론 모두 포함.';
+  var contentSection = hasTranscript ? '[실제 자막]\n'+transcript.text.substring(0,8000) : '[영상 제목]\n'+title;
 
-  var depthGuide = '';
-  if (durationMin <= 5) depthGuide = '짧은 영상이므로 핵심만 간결하게.';
-  else if (durationMin <= 15) depthGuide = '주요 논점과 근거를 충분히 담아주세요.';
-  else if (durationMin <= 30) depthGuide = '논리 흐름, 핵심 주장, 수치/사례, 방법론을 정리해주세요.';
-  else depthGuide = durationMin + '분 장편 영상. 보지 않은 사람도 본 것처럼 대화할 수 있을 만큼 충분한 분량으로. 주장, 논거, 사례, 수치, 방법론, 주의사항, 결론 모두 포함.';
-
-  var contentSection = hasTranscript
-    ? '[실제 자막]\n' + transcript.text.substring(0, 8000)
-    : '[영상 제목]\n' + title;
-
-  var prompt = '당신은 유튜브 영상 전문 분석가입니다. ' + (styleMap[style]||styleMap.general) + '에서 분석해주세요.\n\n영상 제목: ' + title + '\n채널: ' + channelName + '\n영상 길이: ' + (durationMin > 0 ? durationMin + '분' : '알 수 없음') + '\n\n' + contentSection + '\n\n[요약 지침]\n' + depthGuide + '\n\n[형식 규칙]\n- ** ** 기호 절대 사용 금지\n- 구분선(---) 사용 금지\n- 강조는 <strong>태그만 사용\n- 항목은 • 기호 사용\n- 문장 간 빈 줄 최소화\n\n[출력 구조]\n<strong>핵심 주제</strong>\n(2~3문장)\n\n<strong>주요 내용</strong>\n• (구체적 내용)\n• (구체적 내용)\n• (더 추가)\n\n<strong>화자의 핵심 주장</strong>\n(논리/관점)\n\n<strong>실전 적용</strong>\n• (바로 써먹을 수 있는 것)';
+  var prompt = '당신은 유튜브 영상 전문 분석가입니다. '+styleMap[style]+'에서 분석해주세요.\n\n'+
+    '영상 제목: '+title+'\n채널: '+channelName+'\n영상 길이: '+(durationMin>0?durationMin+'분':'알 수 없음')+'\n\n'+contentSection+'\n\n'+
+    '[분석 지침]\n'+depthGuide+'\n\n'+
+    '[출력 형식 - 반드시 아래 구조를 지켜주세요]\n'+
+    '📌 핵심 주제\n(이 영상의 핵심을 2~3문장으로)\n\n'+
+    (style==='coupang' ? '⚠️ 주요 내용\n(구체적인 전략/방법/사례를 항목별로, 수치 있으면 반드시 포함)\n• 항목 1: 설명\n• 항목 2: 설명\n\n' :
+     '📊 주요 내용\n• 항목 1: 설명\n• 항목 2: 설명\n\n')+
+    '💡 화자의 핵심 주장\n(화자가 가장 강조하는 논리나 관점을 2~3문장으로)\n\n'+
+    '✅ 바로 실행할 것\n• 액션 1\n• 액션 2\n• 액션 3\n\n'+
+    '[규칙]\n- ** ** 기호 절대 금지\n- 구분선(---) 금지\n- 소제목은 이모지+텍스트 형식으로\n- 각 항목은 핵심 키워드: 설명 형식\n- 빈 줄로 섹션 구분';
 
   var headers = new Headers();
-  headers.append('Content-Type', 'application/json');
+  headers.append('Content-Type','application/json');
   headers.append('x-api-key', gClaudeKey);
-  headers.append('anthropic-version', '2023-06-01');
-  headers.append('anthropic-dangerous-direct-browser-access', 'true');
+  headers.append('anthropic-version','2023-06-01');
+  headers.append('anthropic-dangerous-direct-browser-access','true');
 
   var res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
-      messages: [{ role: 'user', content: prompt }]
-    })
+    method:'POST', headers:headers,
+    body:JSON.stringify({ model:'claude-sonnet-4-6', max_tokens:4000, messages:[{role:'user',content:prompt}] })
   });
   var d = await res.json();
-  if (d.error) throw new Error('Claude API 오류: ' + d.error.message);
-  return d.content && d.content[0] ? d.content[0].text : '요약 실패';
+  if (d.error) throw new Error('Claude API 오류: '+d.error.message);
+  return d.content&&d.content[0] ? d.content[0].text : '요약 실패';
 }
 
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(function() { alert('복사됐어요! 😊'); });
+function renderSummary(text) {
+  // 소제목(이모지로 시작하는 줄) → 강조, • → li
+  var lines = text.split('\n');
+  var html = '';
+  lines.forEach(function(line) {
+    line = line.trim();
+    if (!line) { html += '<br>'; return; }
+    // 이모지로 시작하는 소제목
+    if (/^[📌⚠️💡✅📊🔑💰👶🎯]/.test(line)) {
+      html += '<span class="sec-title">'+line+'</span>';
+    } else if (line.startsWith('•')) {
+      var content = line.substring(1).trim();
+      // 키워드: 설명 형식
+      content = content.replace(/^([^:：]+)[：:](.+)$/, function(m,k,v){ return '<strong>'+k.trim()+'</strong>:'+v; });
+      html += '<div style="padding:3px 0 3px 14px;position:relative"><span style="position:absolute;left:0;color:var(--accent)">•</span>'+content+'</div>';
+    } else {
+      html += '<p style="margin-bottom:4px">'+line+'</p>';
+    }
+  });
+  return html;
 }
 
 function copySingle(i) {
   var s = allSummaries[i];
   if (!s) return;
-  var strip = function(html) { return html.replace(/<[^>]+>/g,'').replace(/\n{3,}/g,'\n\n').trim(); };
-  var text = '제목: ' + s.title + '\n채널: ' + s.channel + '\n업로드: ' + s.date + '\n\n요약:\n' + strip(s.summary);
-  copyText(text);
+  var strip = function(html){ return html.replace(/<[^>]+>/g,'').replace(/\n{3,}/g,'\n\n').trim(); };
+  var text = '제목: '+s.title+'\n채널: '+s.channel+'\n업로드: '+s.date+'\n\n요약:\n'+strip(s.summary);
+  navigator.clipboard.writeText(text).then(function(){ alert('복사됐어요! 😊'); });
 }
 
 function copyAll() {
   if (!allSummaries.length) return;
-  var strip = function(html) { return html.replace(/<[^>]+>/g,'').replace(/\n{3,}/g,'\n\n').trim(); };
+  var strip = function(html){ return html.replace(/<[^>]+>/g,'').replace(/\n{3,}/g,'\n\n').trim(); };
   var text = '';
-  allSummaries.forEach(function(s, i) {
-    text += '[' + (i+1) + ']\n제목: ' + s.title + '\n채널: ' + s.channel + '\n업로드: ' + s.date + '\n요약:\n' + strip(s.summary) + '\n\n════════════════════\n\n';
+  allSummaries.forEach(function(s,i){
+    text += '['+(i+1)+']\n제목: '+s.title+'\n채널: '+s.channel+'\n업로드: '+s.date+'\n\n요약:\n'+strip(s.summary)+'\n\n════════════════════\n\n';
   });
-  copyText(text.trim());
+  navigator.clipboard.writeText(text.trim()).then(function(){ alert(allSummaries.length+'개 영상 요약 복사됐어요! 😊'); });
+}
+
+async function processVideo(videoId, title, channelName, date, duration, idx, style) {
+  var card = document.createElement('div');
+  card.className = 'video-card';
+  card.innerHTML =
+    '<div class="video-num">'+(idx+1)+'번 영상</div>'+
+    '<div class="video-title">'+title+'</div>'+
+    '<div class="video-meta">'+
+      '<span>'+channelName+'</span><span>'+date+'</span>'+
+      (duration?'<span class="duration-badge">'+formatDuration(duration)+'</span>':'')+
+      '<a class="video-link" href="https://youtube.com/watch?v='+videoId+'" target="_blank">영상 열고 자막 수집 →</a>'+
+    '</div>'+
+    '<div class="summary-box summary-loading" id="sum-'+idx+'">영상 링크를 클릭하면 자막을 자동 수집합니다...</div>'+
+    '<div class="copy-bar" id="copy-'+idx+'" style="display:none"><button class="btn btn-ghost btn-sm" onclick="copySingle('+idx+')">이 영상 요약 복사</button></div>';
+  document.getElementById('results').appendChild(card);
+
+  waitForTranscript(videoId, idx).then(function(transcript) {
+    var statusEl = document.getElementById('sum-'+idx);
+    if (statusEl) statusEl.textContent = '요약 생성 중...';
+    return summarize(title, channelName, date, duration, transcript, style);
+  }).then(function(summary) {
+    var el = document.getElementById('sum-'+idx);
+    if (el) { el.innerHTML = renderSummary(summary); el.classList.remove('summary-loading'); }
+    var cb = document.getElementById('copy-'+idx);
+    if (cb) cb.style.display = 'flex';
+    allSummaries[idx] = { title:title, channel:channelName, date:date, summary:summary, videoId:videoId };
+  }).catch(function(e) {
+    var el = document.getElementById('sum-'+idx);
+    if (el) { el.textContent = '오류: '+e.message; el.classList.remove('summary-loading'); }
+  });
 }
 
 async function startAnalysis() {
   var claudeKey = document.getElementById('claudeKey').value.trim();
   var ytKey = document.getElementById('ytKey').value.trim();
-  var channelInput = document.getElementById('channelInput').value.trim();
   var style = document.getElementById('summaryStyle').value;
-  var startIdx = parseInt(document.getElementById('rangeStart').value) || 1;
-  var endVal = document.getElementById('rangeEnd').value.trim();
-  var endIdx = endVal ? parseInt(endVal) : null;
 
   if (!claudeKey) { alert('Claude API 키를 입력해주세요'); return; }
   if (!ytKey) { alert('YouTube API 키를 입력해주세요'); return; }
-  if (!channelInput) { alert('채널명을 입력해주세요'); return; }
 
   gClaudeKey = claudeKey;
   gStyle = style;
@@ -371,79 +547,71 @@ async function startAnalysis() {
   results.innerHTML = '';
 
   try {
-    setProgress(5, '채널 정보 검색 중...');
-    var channel = await getChannelId(ytKey, channelInput);
-    gChannelName = channel.name;
+    if (currentMode === 'video') {
+      // 개별 영상 모드
+      var inputs = document.querySelectorAll('#urlList .url-item input');
+      var urls = [];
+      inputs.forEach(function(inp){ if(inp.value.trim()) urls.push(inp.value.trim()); });
+      if (!urls.length) { alert('영상 URL을 입력해주세요'); return; }
 
-    var sortLabel = currentSort === 'recent' ? '최신순' : '인기순';
-    setProgress(15, '영상 목록 수집 중...');
-    var videos = await getVideos(ytKey, channel.id, currentSort, startIdx, endIdx);
+      setProgress(10, '영상 정보 가져오는 중...');
+      results.innerHTML = '<div class="results-header"><h2>개별 영상 분석</h2><div style="display:flex;gap:8px"><span style="font-family:monospace;font-size:12px;color:var(--text3)">'+urls.length+'개</span><button class="btn btn-ghost btn-sm" onclick="copyAll()">전체 복사</button></div></div>';
 
-    if (!videos.length) {
-      results.innerHTML = '<div class="error-box">해당 범위에 영상이 없어요.</div>';
-      return;
+      for (var i = 0; i < urls.length; i++) {
+        var videoId = getVideoIdFromUrl(urls[i]);
+        if (!videoId) { alert((i+1)+'번째 URL이 올바르지 않아요'); continue; }
+        setProgress(Math.round(10 + (i/urls.length)*80), (i+1)+'/'+urls.length+' 영상 정보 수집 중...');
+        var info = await getVideoInfo(ytKey, videoId);
+        await processVideo(videoId, info.title, info.channelName, info.date, info.duration, i, style);
+      }
+
+    } else {
+      // 채널 모드
+      var channelInput = document.getElementById('channelInput').value.trim();
+      if (!channelInput) { alert('채널명을 입력해주세요'); return; }
+
+      saveChannelHistory(channelInput);
+
+      var startIdx = parseInt(document.getElementById('rangeStart').value)||1;
+      var endVal = document.getElementById('rangeEnd').value.trim();
+      var endIdx = endVal ? parseInt(endVal) : null;
+
+      setProgress(5, '채널 정보 검색 중...');
+      var channel = await getChannelId(ytKey, channelInput);
+      gChannelName = channel.name;
+
+      var sortLabel = currentSort==='recent'?'최신순':'인기순';
+      setProgress(15, '영상 목록 수집 중...');
+      var videos = await getVideos(ytKey, channel.id, currentSort, startIdx, endIdx);
+      if (!videos.length) { results.innerHTML = '<div class="error-box">영상이 없어요.</div>'; return; }
+
+      setProgress(25, '영상 길이 정보 가져오는 중...');
+      var videoIds = videos.map(function(v){ return v.id.videoId; }).filter(Boolean);
+      var durationMap = await getVideoDetails(ytKey, videoIds);
+
+      results.innerHTML = '<div class="results-header"><h2>'+channel.name+'</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-family:monospace;font-size:12px;color:var(--text3)">'+sortLabel+' · '+videos.length+'개</span><button class="btn btn-ghost btn-sm" onclick="copyAll()">전체 복사</button></div></div>';
+
+      for (var j = 0; j < videos.length; j++) {
+        var v = videos[j];
+        var vId = v.id.videoId;
+        var title = v.snippet.title;
+        var date = formatDate(v.snippet.publishedAt);
+        var duration = durationMap[vId]||0;
+        setProgress(Math.round(25+(j/videos.length)*70), (j+1)+'/'+videos.length+' 카드 생성 중...');
+        await processVideo(vId, title, channel.name, date, duration, j, style);
+      }
     }
 
-    setProgress(20, '영상 정보 가져오는 중...');
-    var videoIds = videos.map(function(v) { return v.id.videoId; }).filter(Boolean);
-    var durationMap = await getVideoDetails(ytKey, videoIds);
-
-    results.innerHTML = '<div class="results-header"><h2>' + channel.name + '</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="results-count">' + sortLabel + ' · ' + videos.length + '개</span><button class="btn btn-ghost btn-sm" onclick="copyAll()">전체 요약 복사</button></div></div>';
-
-    for (var i = 0; i < videos.length; i++) {
-      var v = videos[i];
-      var title = v.snippet.title;
-      var date = formatDate(v.snippet.publishedAt);
-      var videoId = v.id.videoId;
-      var duration = durationMap[videoId] || 0;
-      var globalNum = startIdx + i;
-
-      var pct = Math.round(20 + ((i / videos.length) * 75));
-      setProgress(pct, '(' + (i+1) + '/' + videos.length + ') 영상 카드 생성 중...');
-
-      var card = document.createElement('div');
-      card.className = 'video-card';
-      card.innerHTML = '<div class="video-num">' + String(globalNum).padStart(2,'0') + ' / ' + sortLabel + '</div>' +
-        '<div class="video-title">' + title + '</div>' +
-        '<div class="video-meta">' +
-          '<span>' + channel.name + '</span>' +
-          '<span>' + date + '</span>' +
-          (duration ? '<span class="duration-badge">' + formatDuration(duration) + '</span>' : '') +
-          '<a class="video-link" href="https://youtube.com/watch?v=' + videoId + '" target="_blank">영상 열고 자막 수집 →</a>' +
-        '</div>' +
-        '<div class="summary-box summary-loading" id="sum-' + i + '">영상 링크를 클릭하면 자막을 자동 수집하고 요약합니다...</div>' +
-        '<div class="copy-bar" id="copy-' + i + '" style="display:none"><button class="btn btn-ghost btn-sm" onclick="copySingle(' + i + ')">이 영상 요약 복사</button></div>';
-      results.appendChild(card);
-
-      // 자막 대기 및 요약 (비동기 - 클릭 기다림)
-      (function(idx, vid, ttl, ch, dt, dur, sty) {
-        waitForTranscript(vid, idx).then(function(transcript) {
-          var statusEl = document.getElementById('sum-' + idx);
-          if (statusEl) statusEl.textContent = '요약 생성 중...';
-          return summarize(ttl, ch, dt, dur, transcript, sty);
-        }).then(function(summary) {
-          var el = document.getElementById('sum-' + idx);
-          if (el) { el.innerHTML = summary; el.classList.remove('summary-loading'); }
-          var copyBar = document.getElementById('copy-' + idx);
-          if (copyBar) copyBar.style.display = 'flex';
-          allSummaries[idx] = { title: ttl, channel: ch, date: dt, summary: summary, videoId: vid };
-        }).catch(function(e) {
-          var el = document.getElementById('sum-' + idx);
-          if (el) { el.textContent = '오류: ' + e.message; el.classList.remove('summary-loading'); }
-        });
-      })(i, videoId, title, channel.name, date, duration, style);
-    }
-
-    setProgress(100, '카드 생성 완료! 영상을 클릭해서 자막을 수집하세요.');
+    setProgress(100, '완료! 영상 링크를 클릭해 자막을 수집하세요.');
 
     var finalWrap = document.createElement('div');
     finalWrap.className = 'card';
-    finalWrap.style.marginTop = '24px';
-    finalWrap.innerHTML = '<div class="card-label">안내</div><h2>영상 링크를 클릭해서 자막을 수집하세요</h2><p style="font-size:13px;color:var(--text2);margin-top:8px">크롬 확장 프로그램이 자동으로 자막을 추출해서 요약합니다.<br>클릭 후 유튜브 영상이 열리면 잠시 기다려주세요.</p><div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-accent" onclick="copyAll()">전체 요약 복사하기</button><button class="btn btn-ghost" onclick="location.reload()">새로 분석하기</button></div>';
-    results.appendChild(finalWrap);
+    finalWrap.style.marginTop = '20px';
+    finalWrap.innerHTML = '<div class="card-label">완료</div><h2>영상 링크를 클릭해 자막을 수집하세요</h2><p style="font-size:13px;color:var(--text2);margin-top:6px">크롬 확장 프로그램이 자동으로 자막 추출 → 요약합니다</p><div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-accent" onclick="copyAll()">전체 요약 복사</button><button class="btn btn-ghost" onclick="location.reload()">새로 분석</button></div>';
+    document.getElementById('results').appendChild(finalWrap);
 
   } catch(e) {
-    results.innerHTML = '<div class="error-box">오류 발생: ' + e.message + '</div>';
+    results.innerHTML = '<div class="error-box">오류: '+e.message+'</div>';
   } finally {
     startBtn.disabled = false;
     startBtn.textContent = '분석 시작하기 →';
