@@ -434,9 +434,7 @@ async function waitForTranscript(videoId, cardIndex, totalVideos) {
     };
 
     // 크롬 확장에 자동 탭 열기 요청
-    if (typeof chrome !== 'undefined' && chrome.runtime) {
-      chrome.runtime.sendMessage({ type: 'OPEN_VIDEO_TAB', videoId: videoId });
-    }
+    window.postMessage({ type: 'OPEN_VIDEO_TAB', videoId: videoId }, '*');
 
     // 최대 30초 대기
     var elapsed = 0;
