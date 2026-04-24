@@ -20,17 +20,15 @@ class handler(BaseHTTPRequestHandler):
 
         try:
             ytt_api = YouTubeTranscriptApi()
-            fetched = ytt_api.fetch(video_id, languages=['ko', 'en'])
+            try:
+                fetched = ytt_api.fetch(video_id, languages=['ko', 'en'])
+            except:
+                fetched = ytt_api.fetch(video_id)
+            
             text = ' '.join([t.text for t in fetched])
             self.wfile.write(json.dumps({'transcript': text, 'lang': 'ko'}).encode())
         except Exception as e:
-            try:
-                ytt_api = YouTubeTranscriptApi()
-                fetched = ytt_api.fetch(video_id)
-                text = ' '.join([t.text for t in fetched])
-                self.wfile.write(json.dumps({'transcript': text, 'lang': 'auto'}).encode())
-            except Exception as e2:
-                self.wfile.write(json.dumps({'error': str(e2)}).encode())
+            self.wfile.write(json.dumps({'error': str(e)}).encode())
 
     def do_OPTIONS(self):
         self.send_response(200)
