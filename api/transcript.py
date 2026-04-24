@@ -1,12 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import json
-
-try:
-    from youtube_transcript_api import YouTubeTranscriptApi
-    from youtube_transcript_api.formatters import TextFormatter
-except ImportError:
-    YouTubeTranscriptApi = None
+import urllib.request
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -23,25 +18,32 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({'error': 'videoId required'}).encode())
             return
 
-        if YouTubeTranscriptApi is None:
-            self.wfile.write(json.dumps({'error': 'youtube_transcript_api not installed'}).encode())
-            return
-
         try:
-            transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-            transcript = None
-            for lang in ['ko', 'en']:
-                try:
-                    transcript = transcript_list.find_transcript([lang])
-                    break
-                except:
-                    continue
-            if transcript is None:
-                transcript = transcript_list.find_generated_transcript(['ko', 'en'])
-
-            data = transcript.fetch()
-            text = ' '.join([t['text'] for t in data])
-            self.wfile.write(json.dumps({'transcript': text, 'lang': transcript.language_code}).encode())
+            url = f'https://youtubetotranscript.com/transcript?v={video_id}'
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(req, timeout=15) as response:
+                html = response.read().decode('utf-8')
+            
+            # 자막 텍스트 추출
+            import re
+            pattern = r'<text[^>]*>(.*?)</text>'
+            texts = re.findall(pattern, html, re.DOTALL)
+            
+            if not texts:
+                # 다른 패턴 시도
+                pattern2 = r'"transcript":"(.*?)"'
+                match = re.search(pattern2, html)
+                if match:
+                    text = match.group(1).replace('\\n', ' ')
+                else:
+                    self.wfile.write(json.dumps({'error': '자막을 찾을 수 없어요'}).encode())
+                    return
+            else:
+                text = ' '.join(texts)
+                # HTML 태그 제거
+                text = re.sub(r'<[^>]+>', '', text)
+            
+            self.wfile.write(json.dumps({'transcript': text, 'lang': 'ko'}).encode())
         except Exception as e:
             self.wfile.write(json.dumps({'error': str(e)}).encode())
 
