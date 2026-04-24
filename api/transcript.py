@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import json
-import urllib.request
+from youtube_transcript_api import YouTubeTranscriptApi
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -19,30 +19,12 @@ class handler(BaseHTTPRequestHandler):
             return
 
         try:
-            url = f'https://youtubetotranscript.com/transcript?v={video_id}'
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=15) as response:
-                html = response.read().decode('utf-8')
-            
-            # 자막 텍스트 추출
-            import re
-            pattern = r'<text[^>]*>(.*?)</text>'
-            texts = re.findall(pattern, html, re.DOTALL)
-            
-            if not texts:
-                # 다른 패턴 시도
-                pattern2 = r'"transcript":"(.*?)"'
-                match = re.search(pattern2, html)
-                if match:
-                    text = match.group(1).replace('\\n', ' ')
-                else:
-                    self.wfile.write(json.dumps({'error': '자막을 찾을 수 없어요'}).encode())
-                    return
-            else:
-                text = ' '.join(texts)
-                # HTML 태그 제거
-                text = re.sub(r'<[^>]+>', '', text)
-            
+            ytt_api = YouTubeTranscriptApi()
+            try:
+                fetched = ytt_api.fetch(video_id, languages=['ko', 'en'])
+            except:
+                fetched = ytt_api.fetch(video_id)
+            text = ' '.join([t.text for t in fetched])
             self.wfile.write(json.dumps({'transcript': text, 'lang': 'ko'}).encode())
         except Exception as e:
             self.wfile.write(json.dumps({'error': str(e)}).encode())
