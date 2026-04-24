@@ -3,12 +3,20 @@
     {
       "src": "api/transcript.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "youtube-analyzer.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/transcript",
       "dest": "api/transcript.py"
+    },
+    {
+      "src": "/youtube-analyzer.html",
+      "dest": "youtube-analyzer.html"
     }
   ]
 }
