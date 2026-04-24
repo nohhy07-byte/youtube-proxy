@@ -422,25 +422,34 @@ window.addEventListener('TRANSCRIPT_FROM_EXTENSION', function(event) {
 
 async function waitForTranscript(videoId, cardIndex, totalVideos) {
   return new Promise(function(resolve) {
-    var done = false, elapsed = 0;
-    var waitTime = 5 + ((totalVideos || 1) * 3);
+    var done = false;
     var statusEl = document.getElementById('sum-' + cardIndex);
+    if (statusEl) statusEl.textContent = '자막 수집 중...';
+
     transcriptCallbacks[videoId] = function(data) {
       if (done) return;
       done = true;
       delete transcriptCallbacks[videoId];
       resolve(data.transcript ? { text: data.transcript } : null);
     };
+
+    // 크롬 확장에 자동 탭 열기 요청
+    if (typeof chrome !== 'undefined' && chrome.runtime) {
+      chrome.runtime.sendMessage({ type: 'OPEN_VIDEO_TAB', videoId: videoId });
+    }
+
+    // 최대 30초 대기
+    var elapsed = 0;
     var timer = setInterval(function() {
       if (done) { clearInterval(timer); return; }
       elapsed++;
-      var remaining = waitTime - elapsed;
-      if (statusEl) statusEl.textContent = '영상 링크를 클릭해주세요... (' + remaining + '초 대기)';
-      if (elapsed >= waitTime) {
+      if (statusEl) statusEl.textContent = '자막 수집 중... (' + elapsed + '초)';
+      if (elapsed >= 30) {
         clearInterval(timer);
         if (done) return;
         done = true;
         delete transcriptCallbacks[videoId];
+        if (statusEl) statusEl.textContent = '자막 없음 - 제목 기반 요약';
         resolve(null);
       }
     }, 1000);
@@ -541,7 +550,7 @@ function createVideoCard(videoId, title, channelName, date, duration, idx, total
     '<div class="video-meta">'+
       '<span>'+channelName+'</span><span>'+date+'</span>'+
       (duration?'<span class="duration-badge">'+formatDuration(duration)+'</span>':'')+
-      '<a class="video-link" href="https://youtube.com/watch?v='+videoId+'" target="_blank">영상 열고 자막 수집 →</a>'+
+      '<a class="video-link" href="https://youtube.com/watch?v='+videoId+'" target="_blank">영상 보기 →</a>'+
     '</div>'+
     '<div class="summary-box summary-loading" id="sum-'+idx+'">영상 링크를 클릭하면 자막을 자동 수집합니다...</div>'+
     '<div class="copy-bar" id="copy-'+idx+'" style="display:none"><button class="btn btn-ghost btn-sm" onclick="copySingle('+idx+')">이 영상 요약 복사</button></div>';
