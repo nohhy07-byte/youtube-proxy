@@ -442,10 +442,8 @@ async function waitForTranscript(videoId, cardIndex, totalVideos) {
       resolve(data.transcript ? { text: data.transcript } : null);
     };
 
-    // 크롬 확장에 자동 탭 열기 요청
-    if (typeof chrome !== 'undefined' && chrome.runtime) {
-      chrome.runtime.sendMessage({ type: 'OPEN_VIDEO_TAB', videoId: videoId });
-    }
+    // 크롬 확장에 자동 탭 열기 요청 (webapp_bridge.js 경유)
+    window.postMessage({ type: 'OPEN_VIDEO_TAB', videoId: videoId }, '*');
 
     // 최대 20초만 기다리고 타임아웃
     var timeout = setTimeout(function() {
@@ -771,9 +769,7 @@ async function startAnalysis() {
               transcriptQueue[data.videoId] = data.transcript ? { text: data.transcript } : null;
               delete transcriptCallbacks[data.videoId];
             };
-            if (typeof chrome !== 'undefined' && chrome.runtime) {
-              chrome.runtime.sendMessage({ type: 'OPEN_VIDEO_TAB', videoId: nextVd.videoId });
-            }
+            window.postMessage({ type: 'OPEN_VIDEO_TAB', videoId: nextVd.videoId }, '*');
           }
         }
 
