@@ -19,13 +19,15 @@ class handler(BaseHTTPRequestHandler):
             return
 
         try:
-            transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['ko', 'en'])
-            text = ' '.join([t['text'] for t in transcript_data])
+            ytt_api = YouTubeTranscriptApi()
+            fetched = ytt_api.fetch(video_id, languages=['ko', 'en'])
+            text = ' '.join([t.text for t in fetched])
             self.wfile.write(json.dumps({'transcript': text, 'lang': 'ko'}).encode())
         except Exception as e:
             try:
-                transcript_data = YouTubeTranscriptApi.get_transcript(video_id)
-                text = ' '.join([t['text'] for t in transcript_data])
+                ytt_api = YouTubeTranscriptApi()
+                fetched = ytt_api.fetch(video_id)
+                text = ' '.join([t.text for t in fetched])
                 self.wfile.write(json.dumps({'transcript': text, 'lang': 'auto'}).encode())
             except Exception as e2:
                 self.wfile.write(json.dumps({'error': str(e2)}).encode())
