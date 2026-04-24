@@ -341,12 +341,12 @@ async function getChannelId(ytKey, input) {
 
 async function getVideos(ytKey, channelId, sortType, startIdx, endIdx, contentType) {
   var order = sortType === 'popular' ? 'viewCount' : 'date';
-  // 쇼츠/동영상 필터를 위해 더 많이 가져와야 할 수도 있음
-  var needCount = endIdx ? endIdx * 3 : 300;
+  var needCount = endIdx ? endIdx * 2 : 200;
   var videos = [], pageToken = '';
   while (videos.length < needCount) {
     var fetchCount = Math.min(50, needCount - videos.length);
-    var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&type=video&order=' + order + '&maxResults=' + fetchCount + '&key=' + ytKey;
+    var durParam = contentType === 'video' ? '&videoDuration=medium' : contentType === 'shorts' ? '&videoDuration=short' : '';
+    var url = 'https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=' + channelId + '&type=video&order=' + order + '&maxResults=' + fetchCount + '&key=' + ytKey + durParam;
     if (pageToken) url += '&pageToken=' + pageToken;
     var r = await fetch(url); var d = await r.json();
     if (d.error) throw new Error('영상 목록 오류: ' + d.error.message);
@@ -368,8 +368,8 @@ async function filterByContentType(ytKey, videos, contentType) {
   (d.items||[]).forEach(function(v){ durMap[v.id] = parseDuration(v.contentDetails.duration); });
   return videos.filter(function(v) {
     var dur = durMap[v.id.videoId] || 0;
-    if (contentType === 'shorts') return dur <= 60;  // 60초 이하 = 쇼츠
-    if (contentType === 'video') return dur > 60;    // 60초 초과 = 동영상
+    if (contentType === 'shorts') return dur <= 180;  // 3분 이하 = 쇼츠
+    if (contentType === 'video') return dur > 180;    // 3분 초과 = 동영상
     return true;
   });
 }
@@ -531,7 +531,8 @@ function copyAll() {
   navigator.clipboard.writeText(text.trim()).then(function(){ alert(allSummaries.length+'개 영상 요약 복사됐어요! 😊'); });
 }
 
-async function processVideo(videoId, title, channelName, date, duration, idx, style, totalVideos) {
+// 카드만 생성 (요약 없이)
+function createVideoCard(videoId, title, channelName, date, duration, idx, totalVideos) {
   var card = document.createElement('div');
   card.className = 'video-card';
   card.innerHTML =
@@ -545,21 +546,29 @@ async function processVideo(videoId, title, channelName, date, duration, idx, st
     '<div class="summary-box summary-loading" id="sum-'+idx+'">영상 링크를 클릭하면 자막을 자동 수집합니다...</div>'+
     '<div class="copy-bar" id="copy-'+idx+'" style="display:none"><button class="btn btn-ghost btn-sm" onclick="copySingle('+idx+')">이 영상 요약 복사</button></div>';
   document.getElementById('results').appendChild(card);
+}
 
-  waitForTranscript(videoId, idx, totalVideos).then(function(transcript) {
+// 자막 대기 후 순차 요약
+async function waitAndSummarize(videoId, title, channelName, date, duration, idx, style, totalVideos) {
+  try {
+    var transcript = await waitForTranscript(videoId, idx, totalVideos);
     var statusEl = document.getElementById('sum-'+idx);
     if (statusEl) statusEl.textContent = '요약 생성 중...';
-    return summarize(title, channelName, date, duration, transcript, style);
-  }).then(function(summary) {
+    var summary = await summarize(title, channelName, date, duration, transcript, style);
     var el = document.getElementById('sum-'+idx);
     if (el) { el.innerHTML = renderSummary(summary); el.classList.remove('summary-loading'); }
     var cb = document.getElementById('copy-'+idx);
     if (cb) cb.style.display = 'flex';
     allSummaries[idx] = { title:title, channel:channelName, date:date, summary:summary, videoId:videoId };
-  }).catch(function(e) {
+  } catch(e) {
     var el = document.getElementById('sum-'+idx);
     if (el) { el.textContent = '오류: '+e.message; el.classList.remove('summary-loading'); }
-  });
+  }
+}
+
+async function processVideo(videoId, title, channelName, date, duration, idx, style, totalVideos) {
+  createVideoCard(videoId, title, channelName, date, duration, idx, totalVideos);
+  await waitAndSummarize(videoId, title, channelName, date, duration, idx, style, totalVideos);
 }
 
 async function startAnalysis() {
@@ -594,12 +603,21 @@ async function startAnalysis() {
       setProgress(10, '영상 정보 가져오는 중...');
       results.innerHTML = '<div class="results-header"><h2>개별 영상 분석</h2><div style="display:flex;gap:8px"><span style="font-family:monospace;font-size:12px;color:var(--text3)">'+urls.length+'개</span><button class="btn btn-ghost btn-sm" onclick="copyAll()">전체 복사</button></div></div>';
 
+      // 먼저 모든 영상 정보 수집 후 카드 생성
+      var videoInfos = [];
       for (var i = 0; i < urls.length; i++) {
-        var videoId = getVideoIdFromUrl(urls[i]);
-        if (!videoId) { alert((i+1)+'번째 URL이 올바르지 않아요'); continue; }
-        setProgress(Math.round(10 + (i/urls.length)*80), (i+1)+'/'+urls.length+' 영상 정보 수집 중...');
-        var info = await getVideoInfo(ytKey, videoId);
-        await processVideo(videoId, info.title, info.channelName, info.date, info.duration, i, style, urls.length);
+        var vid = getVideoIdFromUrl(urls[i]);
+        if (!vid) { alert((i+1)+'번째 URL이 올바르지 않아요'); continue; }
+        setProgress(Math.round(10 + (i/urls.length)*40), (i+1)+'/'+urls.length+' 영상 정보 수집 중...');
+        var info = await getVideoInfo(ytKey, vid);
+        videoInfos.push({ videoId:vid, info:info });
+        createVideoCard(vid, info.title, info.channelName, info.date, info.duration, i, urls.length);
+      }
+      setProgress(55, '영상 링크를 클릭해서 자막을 수집하세요!');
+      // 순차 요약
+      for (var si = 0; si < videoInfos.length; si++) {
+        var vi = videoInfos[si];
+        await waitAndSummarize(vi.videoId, vi.info.title, vi.info.channelName, vi.info.date, vi.info.duration, si, style, videoInfos.length);
       }
 
     } else {
@@ -634,14 +652,24 @@ async function startAnalysis() {
 
       results.innerHTML = '<div class="results-header"><h2>'+channel.name+'</h2><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-family:monospace;font-size:12px;color:var(--text3)">'+sortLabel+' · '+videos.length+'개</span><button class="btn btn-ghost btn-sm" onclick="copyAll()">전체 복사</button></div></div>';
 
+      // 카드 전부 먼저 생성
       for (var j = 0; j < videos.length; j++) {
         var v = videos[j];
         var vId = v.id.videoId;
-        var title = v.snippet.title;
-        var date = formatDate(v.snippet.publishedAt);
-        var duration = durationMap[vId]||0;
-        setProgress(Math.round(25+(j/videos.length)*70), (j+1)+'/'+videos.length+' 카드 생성 중...');
-        await processVideo(vId, title, channel.name, date, duration, j, style, videos.length);
+        var vtitle = v.snippet.title;
+        var vdate = formatDate(v.snippet.publishedAt);
+        var vduration = durationMap[vId]||0;
+        createVideoCard(vId, vtitle, channel.name, vdate, vduration, j, videos.length);
+      }
+      setProgress(90, '영상 링크를 클릭해서 자막을 수집하세요!');
+      // 순차적으로 요약 (rate limit 방지)
+      for (var k = 0; k < videos.length; k++) {
+        var vk = videos[k];
+        var vkId = vk.id.videoId;
+        var vkTitle = vk.snippet.title;
+        var vkDate = formatDate(vk.snippet.publishedAt);
+        var vkDur = durationMap[vkId]||0;
+        await waitAndSummarize(vkId, vkTitle, channel.name, vkDate, vkDur, k, style, videos.length);
       }
     }
 
