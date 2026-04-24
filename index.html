@@ -243,18 +243,53 @@ function formatDuration(sec) {
 }
 
 // 자막 가져오기 (YouTube API transcript)
-async function getTranscript(videoId) {
-  try {
-    const url = `https://youtube-proxy-tan.vercel.app/api/transcript?videoId=${videoId}`;
-    const r = await fetch(url);
-    const d = await r.json();
-    if (d.transcript && d.transcript.length > 100) {
-      return { text: d.transcript, lang: d.lang || 'ko' };
-    }
-    return null;
-  } catch(e) {
-    return null;
+// 크롬 확장에서 자막 수신
+const transcriptCallbacks = {};
+
+// 크롬 확장 브릿지에서 CustomEvent 수신
+window.addEventListener('TRANSCRIPT_FROM_EXTENSION', (event) => {
+  const data = event.detail;
+  if (data && transcriptCallbacks[data.videoId]) {
+    transcriptCallbacks[data.videoId](data);
   }
+});
+
+async function waitForTranscript(videoId, title, channelName, date, duration, cardIndex, style) {
+  const statusEl = document.getElementById(`sum-${cardIndex}`);
+  
+  return new Promise(async (resolve) => {
+    let done = false;
+    
+    // 콜백 등록
+    transcriptCallbacks[videoId] = async (data) => {
+      if (done) return;
+      done = true;
+      delete transcriptCallbacks[videoId];
+      if (statusEl) statusEl.textContent = '자막 수집 완료! 요약 중...';
+      const summary = await summarize(claudeKey_global, title, channelName, date, duration, data.transcript ? { text: data.transcript } : null, style_global);
+      resolve(summary);
+    };
+
+    // 타임아웃 60초
+    let elapsed = 0;
+    const timer = setInterval(() => {
+      if (done) { clearInterval(timer); return; }
+      elapsed += 1;
+      const remaining = 60 - elapsed;
+      if (statusEl) statusEl.textContent = `영상 링크를 클릭해주세요... (${remaining}초 대기 중)`;
+      if (elapsed >= 60) {
+        clearInterval(timer);
+        if (done) return;
+        done = true;
+        delete transcriptCallbacks[videoId];
+        summarize(claudeKey_global, title, channelName, date, duration, null, style_global).then(resolve);
+      }
+    }, 1000);
+  });
+}
+
+function openAndWait(videoId, cardIndex) {
+  // 새 탭 열기만 하면 됨 - 확장이 자동으로 자막 추출
 }
 
 async function summarize(claudeKey, title, channelName, date, duration, transcript, style) {
@@ -358,11 +393,16 @@ function copyAll() {
   navigator.clipboard.writeText(text.trim()).then(() => alert(`${allSummaries.length}개 영상 요약이 복사됐어요! 😊`));
 }
 
+let claudeKey_global = '';
+let style_global = 'coupang';
+
 async function startAnalysis() {
   const claudeKey = document.getElementById('claudeKey').value.trim();
   const ytKey = document.getElementById('ytKey').value.trim();
   const channelInput = document.getElementById('channelInput').value.trim();
   const style = document.getElementById('summaryStyle').value;
+  claudeKey_global = claudeKey;
+  style_global = style;
   const startIdx = parseInt(document.getElementById('rangeStart').value) || 1;
   const endVal = document.getElementById('rangeEnd').value.trim();
   const endIdx = endVal ? parseInt(endVal) : null;
@@ -430,19 +470,17 @@ async function startAnalysis() {
           <span>${channel.name}</span>
           <span>${date}</span>
           ${duration ? `<span class="duration-badge">${formatDuration(duration)}</span>` : ''}
-          <a class="video-link" href="https://youtube.com/watch?v=${videoId}" target="_blank">영상 보기 →</a>
+          <a class="video-link" href="https://youtube.com/watch?v=${videoId}" target="_blank" onclick="openAndWait('${videoId}', ${i})">영상 열고 자막 수집 →</a>
         </div>
-        <div class="summary-box summary-loading" id="sum-${i}">자막 수집 및 요약 생성 중...</div>
+        <div class="summary-box summary-loading" id="sum-${i}">영상 링크 클릭 시 자동으로 자막을 수집하고 요약합니다...</div>
         <div class="copy-bar" id="copy-${i}" style="display:none;">
           <button class="btn btn-ghost btn-sm" onclick="copySingle(${i})">이 영상 요약 복사</button>
         </div>
       `;
       results.appendChild(card);
 
-      try {
-        // 자막 시도
-        const transcript = await getTranscript(videoId);
-        const summary = await summarize(claudeKey, title, channel.name, date, duration, transcript, style);
+      // 자막 크롬 확장에서 가져오기
+      const summary = await waitForTranscript(videoId, title, channel.name, date, duration, i, style);
 
         const el = document.getElementById(`sum-${i}`);
         el.innerHTML = summary;
