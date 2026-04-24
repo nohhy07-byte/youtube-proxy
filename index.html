@@ -471,7 +471,10 @@ async function summarize(title, channelName, date, duration, transcript, style) 
     durationMin<=15 ? '주요 논점과 근거를 충분히.' :
     durationMin<=30 ? '논리 흐름, 핵심 주장, 수치/사례, 방법론을 정리.' :
     durationMin+'분 장편. 보지 않은 사람도 본 것처럼 대화할 수 있을 만큼. 주장, 논거, 사례, 수치, 방법론, 주의사항, 결론 모두 포함.';
-  var contentSection = hasTranscript ? '[실제 자막]\n'+transcript.text.substring(0,8000) : '[영상 제목]\n'+title;
+  if (!hasTranscript) {
+    return '⚠️ 자막을 가져올 수 없어 요약이 불가합니다.\n\nVercel 주소(youtube-proxy-tan.vercel.app)로 접속 후 크롬 확장 프로그램을 통해 다시 시도해주세요.';
+  }
+  var contentSection = '[실제 자막]\n'+transcript.text.substring(0,8000);
 
   var prompt = '당신은 유튜브 영상 전문 분석가입니다. '+styleMap[style]+'에서 분석해주세요.\n\n'+
     '영상 제목: '+title+'\n채널: '+channelName+'\n영상 길이: '+(durationMin>0?durationMin+'분':'알 수 없음')+'\n\n'+contentSection+'\n\n'+
@@ -502,9 +505,10 @@ async function summarize(title, channelName, date, duration, transcript, style) 
     '- 항목은 "키워드: 설명" 형식\n'+
     '- 표는 마크다운 형식 사용\n'+
     '- 빈 줄로 섹션 구분\n'+
-    '- AI의 의견, 평가, 추가 설명 절대 금지\n'+
-    '- 오직 영상 화자가 말한 내용만 요약할 것\n'+
-    '- "이 영상은~", "화자는~" 같은 3인칭 서술 금지, 내용만 직접 서술';
+    '- AI의 개인 의견, 평가, 추측 절대 금지\n'+
+    '- 오직 자막에 있는 내용만 요약할 것\n'+
+    '- 내용을 지어내거나 추측하지 말 것\n'+
+    '- 내용만 직접 서술';
 
   var headers = new Headers();
   headers.append('Content-Type','application/json');
